@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+SUB="meta"
+ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
+APPS=(rig-looper rig-meter rig-midimon rig-template)
+for app in "${APPS[@]}"; do
+  dir="$ROOT/$app"
+  [ -d "$dir" ] || continue
+  if [ -L "$dir/$SUB" ]; then
+    echo "$app/$SUB is a dev symlink; skipping"
+    continue
+  fi
+  (cd "$dir" && git submodule update --remote "$SUB" >/dev/null 2>&1) && echo "updated $app/$SUB working tree" || true
+done
+echo "Reminder: commit/push app submodule bumps when ready."
